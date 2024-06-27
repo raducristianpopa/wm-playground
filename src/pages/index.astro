@@ -1,16 +1,235 @@
----
-
----
-
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<html lang="en" data-theme="light">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <title>Astro</title>
+    </head>
+    <body>
+        <main>
+            <h1>Web Monetization<br/>Playground</h1>
+            <div class="form-wrapper">
+                <form id="walletAddressForm">
+                    <div class="form-field">
+                        <label for="walletAddressUrl">Wallet address URL</label>
+                        <input type="url" id="walletAddressUrl" name="walletAddressUrl" aria-invalid="false" aria-describedby="walletAddressUrl-error" required>
+                    </div>
+                    <button full-width type="submit">Add monetization link</button>
+                </form>
+            </div>
+            <div id="link-events"></div>
+        </main>
+    </body>
 </html>
+
+<style>
+    :root {
+        --purple: #470c6e;
+        --dark-purple: #2a0f49;
+        --white: #fff;
+        --neon-pink: #da35ba;
+        --light-pink: #ffc2f3;
+        --neon-teal: #08ffff;
+        --light-teal: #92ffff;
+        --neon-green: #00ff9d;
+        --bright-green: #94ffd6;
+        --neon-yellow: #ffea00;
+        --light-yellow: #fff8ac;
+        --black: #222;
+        --green: #02bb3e;
+        --light-green: #eefee5;
+        --dark-green: #0e7b31;
+        --dark-pink: #c011a0;
+        --dark-orange: #c13900;
+        --bright-purple: #7e1ac0;
+    }
+
+    [data-theme="light"] {
+        --background: var(--white);
+        --text: var(--black);
+        --accent: var(--green);
+
+        --button-background: var(--dark-green);
+        --button-text: var(--white);
+    }
+
+    [data-theme="dark"] {
+        --background: var(--purple);
+        --text: var(--white);
+    }
+
+*, *::after, *::before {
+    font-family: sans-serif;
+    margin: 0;
+    box-sizing: border-box
+}
+
+    body {
+        background-color: var(--background);
+        color: var(--text);
+    }
+
+    main {
+        padding: 3rem;
+        min-width: 0;
+    }
+
+    h1 {
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    input, button {
+        font: inherit;
+    }
+
+    .form-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-block-start: 2rem;
+        margin-inline: auto;
+        max-width: 756px;
+
+        form {
+            min-width: 378px;
+        }
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        margin-block-end: 1rem;
+
+        label {
+            white-space: nowrap;
+            margin-block-end: 0.25rem;
+        }
+
+        .form-field-error {
+            margin-block-start: .5rem;
+            color: red;
+        }
+    }
+
+    input {
+        border: 1px solid var(--accent);
+        border-radius: .375rem;
+        padding: .5rem;
+        background-color: transparent;
+        transition: box-shadow ease-in-out .2s,border-color ease-in-out .2s;
+        color: var(--text);
+    }
+
+    button {
+        display: inline-block;
+        border: 2px solid transparent; 
+        background-color: var(--button-background);
+        color: var(--button-text);
+        padding: .75rem;
+        border-radius: .375rem;
+        cursor: pointer;
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-underline-offset: 2px;
+        transition: text-decoration-color .2s ease-in-out;
+
+        &[full-width] {
+            width: 100%;
+        }
+
+        &:hover {
+            text-decoration-color: currentcolor;
+        }
+    }
+
+    @media screen and (min-width: 768px) {
+        main {
+            padding: 2rem;
+        }
+    }
+
+    #link-events {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 4rem;
+        margin-block-start: 2rem;
+        padding-inline: 6rem;
+    }
+</style>
+
+<script>
+
+    const form = document.querySelector("#walletAddressForm") as HTMLFormElement;
+    const linkEvents = document.querySelector("#link-events") as HTMLDivElement;
+
+    function createLinkTag(href: string) {
+        const link = document.createElement('link')
+        link.rel = "monetization"
+        link.href = href;
+        link.addEventListener("monetization", onMonetizationListener)
+        link.addEventListener("load", onLoadListener);
+        link.addEventListener("error", onErrorListener);
+        link.dataset.walletAddress = href;
+        document.head.append(link)
+    }
+
+    function createLinkEventLog(href: string) {
+        const title = document.createElement('h4');
+        title.textContent = href; 
+
+        const div = document.createElement('div');
+        div.append(title);
+        div.dataset.walletAddress = href
+
+        linkEvents.append(div);
+    }
+
+    function onMonetizationListener(event: MonetizationEvent) {
+        if (!(event.target instanceof HTMLLinkElement)) return
+        if (!event.target.isConnected) return
+
+        const linkEvents = document.querySelector(`#link-events div[data-wallet-address='${event.target.dataset.walletAddress}']`) as HTMLDivElement;
+        const log = document.createElement('div');
+        log.textContent = event.type
+        linkEvents.append(log)
+    }
+
+    function onLoadListener(event: Event) {
+        if (!(event.target instanceof HTMLLinkElement)) return
+        if (!event.target.isConnected) return
+
+        const linkEvents = document.querySelector(`#link-events div[data-wallet-address='${event.target.dataset.walletAddress}']`) as HTMLDivElement;
+        const log = document.createElement('div');
+        log.textContent = event.type
+        linkEvents.append(log)
+    }
+
+    function onErrorListener(event: Event) {
+        if (!(event.target instanceof HTMLLinkElement)) return
+        if (!event.target.isConnected) return
+
+        const linkEvents = document.querySelector(`#link-events div[data-wallet-address='${event.target.dataset.walletAddress}']`) as HTMLDivElement;
+        const log = document.createElement('div');
+        log.textContent = event.type
+        linkEvents.append(log)
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const input = form.querySelector('input');
+        const formData = new FormData(form)
+        const walletAddressUrl = formData.get('walletAddressUrl')?.valueOf();
+
+        if(!walletAddressUrl || typeof walletAddressUrl !== "string") {
+            input?.setCustomValidity('Please fill the wallet address URL field.')
+            return
+        }
+
+        createLinkTag(walletAddressUrl);
+        createLinkEventLog(walletAddressUrl)
+        form.reset();
+    })
+</script>
