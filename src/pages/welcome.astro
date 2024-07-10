@@ -10,6 +10,9 @@
         INVALID = "grant_invalid"
     }
 
+    const errorCodeToMessage = {
+    }
+
     const searchParams = new URL(document.location.href).searchParams;
     const d = document.querySelector("#message") as HTMLDivElement;
     const di = document.querySelector("#image") as HTMLDivElement;
@@ -21,6 +24,7 @@
             di.textContent = "success image";
             break;
         case SuccessParam.ERROR:
+            const errorCode = searchParams.get('error_code')
             d.textContent = "Something went wrong. Please try again";
             di.textContent = "error image"
             break;

@@ -4,7 +4,7 @@ declare global {
     interface MonetizationEvent extends Event {
         readonly paymentPointer: string;
         readonly incomingPayment: string;
-        readonly amount: PaymentCurrencyAmount;
+        readonly amountSent: PaymentCurrencyAmount;
     }
 
     interface ElementEventMap {
