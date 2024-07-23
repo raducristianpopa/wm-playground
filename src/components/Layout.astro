@@ -1,103 +1,116 @@
 ---
 import ThemeToggle from "../components/ThemeToggle.astro";
 ---
+
 <!doctype html>
 <html lang="en" data-theme="light">
-    <head>
-        <meta charset="utf-8" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <meta name="viewport" content="width=device-width" />
-        <meta name="generator" content={Astro.generator} />
-        <title>Web Monetization Playground</title>
-    </head>
-    <body>
-        <ThemeToggle />
-        <main>
-            <slot />
-        </main>
-    </body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Web Monetization Playground</title>
+  </head>
+  <body>
+    <main>
+      <slot />
+    </main>
+  </body>
 </html>
 
 <style is:global>
-    :root {
-        --purple: #470c6e;
-        --dark-purple: #2a0f49;
-        --white: #fff;
-        --neon-pink: #da35ba;
-        --light-pink: #ffc2f3;
-        --neon-teal: #08ffff;
-        --light-teal: #92ffff;
-        --neon-green: #00ff9d;
-        --bright-green: #94ffd6;
-        --neon-yellow: #ffea00;
-        --light-yellow: #fff8ac;
-        --black: #222;
-        --green: #02bb3e;
-        --light-green: #eefee5;
-        --dark-green: #0e7b31;
-        --dark-pink: #c011a0;
-        --dark-orange: #c13900;
-        --bright-purple: #7e1ac0;
-    }
+  :root {
+    --space-3xs: clamp(0.25rem, 0.25rem + 0vi, 0.25rem);
+    --space-2xs: clamp(0.5rem, 0.5rem + 0vi, 0.5rem);
+    --space-xs: clamp(0.75rem, 0.75rem + 0vi, 0.75rem);
+    --space-s: clamp(1rem, 1rem + 0vi, 1rem);
+    --space-m: clamp(1.5rem, 1.5rem + 0vi, 1.5rem);
+    --space-l: clamp(2rem, 2rem + 0vi, 2rem);
+    --space-xl: clamp(3rem, 3rem + 0vi, 3rem);
+    --space-2xl: clamp(4rem, 4rem + 0vi, 4rem);
+    --space-3xl: clamp(6rem, 6rem + 0vi, 6rem);
 
-    [data-theme="light"] {
-        --background: var(--white);
-        --text: var(--black);
-        --accent: var(--green);
+    --purple: #470c6e;
+    --dark-purple: #2a0f49;
+    --white: #fff;
+    --neon-pink: #da35ba;
+    --light-pink: #ffc2f3;
+    --neon-teal: #08ffff;
+    --light-teal: #92ffff;
+    --neon-green: #00ff9d;
+    --bright-green: #94ffd6;
+    --neon-yellow: #ffea00;
+    --light-yellow: #fff8ac;
+    --black: #222;
+    --green: #02bb3e;
+    --light-green: #eefee5;
+    --dark-green: #0e7b31;
+    --dark-pink: #c011a0;
+    --dark-orange: #c13900;
+    --bright-purple: #7e1ac0;
+  }
 
-        --button-background: var(--dark-green);
-        --button-text: var(--white);
-    }
+  [data-theme="light"] {
+    --background: var(--white);
+    --text: var(--black);
+    --accent: var(--green);
 
-    [data-theme="dark"] {
-        --background: var(--purple);
-        --text: var(--white);
-    }
+    --button-background: var(--dark-green);
+    --button-text: var(--white);
+  }
 
-    @font-face {
-        font-family: DejaVu Sans Mono;
-        src: url(/fonts/DejaVuSansMono.ttf);
-        font-weight: 400;
-        font-style: normal
-    }
+  [data-theme="dark"] {
+    --background: var(--purple);
+    --text: var(--white);
+  }
 
-    @font-face {
-        font-family: DejaVu Sans Mono;
-        src: url(/fonts/DejaVuSansMono-Bold.ttf); 
-        font-weight: 700;
-        font-style: normal
-    }
+  @font-face {
+    font-family: DejaVu Sans Mono;
+    src: url(/fonts/DejaVuSansMono.ttf);
+    font-weight: 400;
+    font-style: normal;
+  }
 
-    @font-face {
-        font-family: DejaVu Sans Mono;
-        src: url(/fonts/DejaVuSansMono-Oblique.ttf);
-        font-weight: 400;
-        font-style: italic
-    }
+  @font-face {
+    font-family: DejaVu Sans Mono;
+    src: url(/fonts/DejaVuSansMono-Bold.ttf);
+    font-weight: 700;
+    font-style: normal;
+  }
 
-    *, *::after, *::before {
-        font-family: sans-serif;
-        margin: 0;
-        box-sizing: border-box
-    }
+  @font-face {
+    font-family: DejaVu Sans Mono;
+    src: url(/fonts/DejaVuSansMono-Oblique.ttf);
+    font-weight: 400;
+    font-style: italic;
+  }
 
-    body {
-        font-family: DejaVu Sans Mono;
-        background-color: var(--background);
-        color: var(--text);
-    }
+  *,
+  *::after,
+  *::before {
+    font-family: sans-serif;
+    margin: 0;
+    box-sizing: border-box;
+  }
 
-    main {
-        padding: 3rem;
-        min-width: 0;
-    }
+  body {
+    font-family: DejaVu Sans Mono;
+    background-color: var(--background);
+    color: var(--text);
+  }
 
-    h1 {
-        text-transform: uppercase;
-        text-align: center;
-    }
+  main {
+    padding: 3rem;
+    min-width: 0;
+  }
 
-    input, button {
-        font: inherit;
-    }
+  h1 {
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  input,
+  button {
+    font: inherit;
+  }
 </style>
