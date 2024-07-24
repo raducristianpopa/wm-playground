@@ -9,7 +9,7 @@ import Layout from "../components/Layout.astro";
       <div class="form-field">
         <label for="walletAddressUrl">Wallet address URL</label>
         <input
-          type="url"
+          type="text"
           id="walletAddressUrl"
           name="walletAddressUrl"
           required
@@ -51,57 +51,30 @@ import Layout from "../components/Layout.astro";
     }
   }
 
-  input {
-    border: 1px solid var(--accent);
-    border-radius: 0.375rem;
-    padding: 0.5rem;
-    background-color: transparent;
-    transition:
-      box-shadow ease-in-out 0.2s,
-      border-color ease-in-out 0.2s;
-    color: var(--text);
-  }
-
-  button {
-    display: inline-block;
-    border: 2px solid transparent;
-    background-color: var(--button-background);
-    color: var(--button-text);
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    text-decoration: underline;
-    text-decoration-color: transparent;
-    text-underline-offset: 2px;
-    transition: text-decoration-color 0.2s ease-in-out;
-
-    &[full-width] {
-      width: 100%;
-    }
-
-    &:hover {
-      text-decoration-color: currentcolor;
-    }
-  }
-
   #link-events {
     display: grid;
     gap: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(30ch, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(50ch, 1fr));
     margin-block-start: 2rem;
 
     div[data-wallet-address] {
-      height: 16rem;
-      overflow-y-auto: auto;
       border-radius: 0.5rem;
       border: 2px solid var(--black);
       padding: 0.5rem;
 
       & .log-header {
         display: flex;
+        gap: 1rem;
         align-items: center;
         justify-content: space-between;
         flex-direction: row;
+        color: var(--dark-green);
+
+        & h4 {
+          overflow-x: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       }
 
       & .actions {
@@ -114,9 +87,12 @@ import Layout from "../components/Layout.astro";
       }
 
       & ul.events {
-        margin-block-start: 1rem;
+        height: 16rem;
+        margin-block: 0.5rem;
+        padding-block-start: 0.5rem;
         padding-inline-start: 0.5rem;
         list-style: none;
+        overflow-y: auto;
       }
     }
   }
@@ -133,10 +109,27 @@ import Layout from "../components/Layout.astro";
 
   @media screen and (max-width: 768px) {
     #link-events {
+      display: flex;
+      flex-direction: column;
+
       div[data-wallet-address] {
         & .log-header {
           align-items: flex-start;
           flex-direction: column;
+
+          & h4 {
+            margin-inline: auto;
+          }
+
+          & .actions {
+            width: 100%;
+            padding-inline: 5rem;
+
+            & button:last-of-type {
+              display: block;
+              margin-inline-start: auto;
+            }
+          }
         }
       }
     }
@@ -144,7 +137,16 @@ import Layout from "../components/Layout.astro";
 </style>
 
 <script>
+  interface WalletAddress {
+    id: string;
+    assetScale: number;
+    assetCode: string;
+    authServer: string;
+    resourceServer: string;
+  }
+
   const form = document.querySelector("#walletAddressForm") as HTMLFormElement;
+  const input = form.querySelector("input") as HTMLInputElement;
   const linkEvents = document.querySelector("#link-events") as HTMLDivElement;
 
   async function createLinkTag(href: string) {
@@ -161,18 +163,6 @@ import Layout from "../components/Layout.astro";
   }
 
   async function createLinkEventLog(href: string) {
-    const response = await fetch(href, {
-      method: "GET",
-      credentials: "omit",
-      headers: {
-        Accept: "application/json",
-      },
-    });
-    const walletAddress = (await response.json()) as {
-      assetCode: string;
-      assetScale: number;
-    };
-
     const header = document.createElement("div");
     header.classList.add("log-header");
 
@@ -184,9 +174,28 @@ import Layout from "../components/Layout.astro";
 
     const disableButton = document.createElement("button");
     disableButton.textContent = "Disable";
+    disableButton.classList.add("outline");
+    disableButton.addEventListener("click", () => {
+      const link = document.querySelector(
+        `link[rel='monetization'][href='${href}']`
+      ) as HTMLLinkElement;
+      link.disabled = !link.disabled;
+      disableButton.textContent = link.disabled ? "Enable" : "Disable";
+    });
 
     const removeButton = document.createElement("button");
     removeButton.textContent = "Remove";
+    removeButton.classList.add("outline");
+    removeButton.addEventListener("click", () => {
+      const link = document.querySelector(
+        `link[rel='monetization'][href='${href}']`
+      ) as HTMLLinkElement;
+      link.remove();
+      const eventLog = document.querySelector(
+        `#link-events div[data-wallet-address='${href}']`
+      ) as HTMLDivElement;
+      eventLog.remove();
+    });
 
     actions.append(disableButton);
     actions.append(removeButton);
@@ -196,8 +205,6 @@ import Layout from "../components/Layout.astro";
 
     const eventLog = document.createElement("div");
     eventLog.dataset.walletAddress = href;
-    eventLog.dataset.assetCode = walletAddress.assetCode;
-    eventLog.dataset.assetScale = walletAddress.assetScale.toString();
 
     const events = document.createElement("ul");
     events.classList.add("events");
@@ -228,16 +235,16 @@ import Layout from "../components/Layout.astro";
   ) {
     const log = document.createElement("li");
     const time = new Date().toLocaleTimeString();
-    let slot = `[${time}] ${capitalize(type)} Event`;
+    let slot = `${capitalize(type)} Event`;
 
     if (event) {
       slot += ` - ${event.amountSent.value} ${event.amountSent.currency}`;
-      log.innerHTML = `<wm-tooltip slot="${slot}" content='${JSON.stringify(JSON.stringify(event))}'></wm-tooltip>`;
+      log.innerHTML = `<wm-tooltip time="${time}" slot="${slot}" content='${JSON.stringify(JSON.stringify(event))}'></wm-tooltip>`;
     } else {
-      log.textContent = slot;
+      log.textContent = `[${time}] ${slot}`;
     }
 
-    div.append(log);
+    div.prepend(log);
   }
 
   function onMonetizationListener(event: MonetizationEvent) {
@@ -248,6 +255,10 @@ import Layout from "../components/Layout.astro";
       linkEventLog.dataset.incomingPayment = event.incomingPayment;
     }
 
+    createLog(linkEventLog, event.type, event);
+    createLog(linkEventLog, event.type, event);
+    createLog(linkEventLog, event.type, event);
+    createLog(linkEventLog, event.type, event);
     createLog(linkEventLog, event.type, event);
   }
 
@@ -265,147 +276,159 @@ import Layout from "../components/Layout.astro";
     createLog(linkEventLog, event.type);
   }
 
+  input.addEventListener("input", function (e) {
+    this.setCustomValidity("");
+  });
+
+  function toWalletAddressUrl(s: string): string {
+    return s.startsWith("$") ? s.replace("$", "https://") : s;
+  }
+
+  async function validateWalletAddressUrl(url: string): Promise<void> {
+    const walletAddressUrl = new URL(toWalletAddressUrl(url)).href;
+    const response = await fetch(walletAddressUrl, {
+      method: "GET",
+      credentials: "omit",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    const walletAddress = await response.json();
+    const isValid = isWalletAddress(walletAddress);
+
+    if (!isValid) {
+      input.setCustomValidity(
+        `${walletAddressUrl} is not a valid wallet address.`
+      );
+      input.reportValidity();
+      throw new Error("Invalid wallet address.");
+    }
+  }
+
+  function isWalletAddress(o: any): o is WalletAddress {
+    return (
+      o.id &&
+      typeof o.id === "string" &&
+      o.assetScale &&
+      typeof o.assetScale === "number" &&
+      o.assetCode &&
+      typeof o.assetCode === "string" &&
+      o.authServer &&
+      typeof o.authServer === "string" &&
+      o.resourceServer &&
+      typeof o.resourceServer === "string"
+    );
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const input = form.querySelector("input");
     const formData = new FormData(form);
-    const walletAddressUrl = formData.get("walletAddressUrl")?.valueOf();
+    const walletAddress = formData.get("walletAddressUrl")?.valueOf();
 
-    if (!walletAddressUrl || typeof walletAddressUrl !== "string") {
-      input?.setCustomValidity("Please fill the wallet address URL field.");
+    if (!walletAddress || typeof walletAddress !== "string") {
+      input.setCustomValidity("Please fill the wallet address URL field.");
       return false;
     }
+
+    const walletAddressUrl = toWalletAddressUrl(walletAddress);
 
     const walletAddressElement = document.querySelector(
-      `[data-wallet-address='${walletAddressUrl}']`
+      `[data-wallet-address='${walletAddress}']`
     );
     if (walletAddressElement) {
-      input?.setCustomValidity(
-        `${walletAddressUrl} already exists in the page.`
-      );
-      input?.reportValidity();
+      input.setCustomValidity(`${walletAddress} already exists in the page.`);
+      input.reportValidity();
       return false;
     }
 
-    await createLinkTag(walletAddressUrl);
+    await validateWalletAddressUrl(walletAddressUrl);
     await createLinkEventLog(walletAddressUrl);
+    await createLinkTag(walletAddressUrl);
+
     form.reset();
-    return false;
   });
 
   class Tooltip extends HTMLElement {
-    private wrapper: HTMLSpanElement = document.createElement("span");
+    private tooltip: HTMLSpanElement = document.createElement("span");
     private questionMark: HTMLButtonElement = document.createElement("button");
+    private shadow = this.attachShadow({ mode: "open" });
     constructor() {
       super();
     }
 
     connectedCallback() {
-      const shadow = this.attachShadow({ mode: "open" });
       const stylesheet = this.createStylesheet();
 
       const content = this.getAttribute("content");
       const slot = this.getAttribute("slot");
+      const time = this.getAttribute("time");
 
-      if (!content || !slot) {
+      if (!content || !slot || !time) {
         throw new Error(
           "Make sure `content` and `slot` attributes are passed to the component."
         );
       }
 
-      this.createTooltip(content);
-      this.wrapper.prepend(slot);
-      shadow.append(this.wrapper);
+      this.createTooltip(content, slot, time);
 
-      this.wrapper.addEventListener("mouseover", () => {
-        const button = this.wrapper.querySelector("button");
-        button?.setAttribute("aria-expanded", "true");
-        const bubble = this.wrapper.querySelector(".bubble") as HTMLSpanElement;
-        this.positionCheck(bubble);
-      });
-
-      this.wrapper.addEventListener("mouseleave", () => {
-        const button = this.wrapper.querySelector("button");
-        button?.setAttribute("aria-expanded", "false");
-      });
-
-      this.questionMark.addEventListener("click", () => {
-        if (this.getAttribute("aria-expanded") === "true") {
-          this.setAttribute("aria-expanded", "false");
-        } else {
-          this.setAttribute("aria-expanded", "true");
-          const bubble = this.nextSibling;
-          //@ts-ignore
-          this.positionCheck(bubble);
-        }
-      });
-
-      this.questionMark.addEventListener("blur", () => {
-        this.setAttribute("aria-expanded", "false");
-      });
-
-      this.questionMark.addEventListener("focus", () => {
-        this.setAttribute("aria-expanded", "true");
-        const bubble = this.questionMark.nextSibling;
-        //@ts-ignore
-        this.positionCheck(bubble);
-      });
-      shadow.adoptedStyleSheets = [stylesheet];
+      this.shadow.append(this.tooltip);
+      this.shadow.adoptedStyleSheets = [stylesheet];
+      this.registerEventListeners();
     }
 
-    private positionCheck(elem: HTMLSpanElement) {
-      const isDesktop = this.parentElement!.parentElement!.clientWidth > 768;
-      const leftPos = elem.getBoundingClientRect().left;
-      const rightPos = elem.getBoundingClientRect().right + elem.offsetWidth;
+    private registerEventListeners() {
+      this.tooltip.addEventListener("mouseenter", () => {
+        const button = this.tooltip.querySelector(
+          "button"
+        ) as HTMLButtonElement;
+        button.setAttribute("aria-expanded", "true");
+        const bubble = this.tooltip.querySelector(".bubble") as HTMLSpanElement;
+        this.positionTooltip(bubble);
+      });
+
+      this.tooltip.addEventListener("mouseleave", () => {
+        const button = this.tooltip.querySelector(
+          "button"
+        ) as HTMLButtonElement;
+        button.setAttribute("aria-expanded", "false");
+        const bubble = this.tooltip.querySelector(".bubble") as HTMLSpanElement;
+        bubble.style.left = "initial";
+        bubble.style.top = "initial";
+      });
+    }
+
+    private positionTooltip(elem: HTMLSpanElement) {
+      const isDesktop = window.innerWidth > 768;
+      const elemRect = elem.getBoundingClientRect();
       const parent = elem.parentElement as HTMLElement;
-      console.log(leftPos, rightPos);
-      if (leftPos < 0 && rightPos > window.innerWidth) {
-        parent.className += " wrapperAdjust";
-        elem.className += " bubbleAdjust";
-        elem.style.top = `${parent.offsetTop - elem.offsetHeight}px`;
-        //@ts-ignore
-        elem.previousElementSibling.className += " btnAdjust";
-        //@ts-ignore
-        elem.previousElementSibling.style.top = `${parent.offsetTop - 4}px`;
-        //@ts-ignore
-        elem.previousElementSibling.style.left = `${parent.offsetLeft + parent.offsetWidth - 3}px`;
-      } else if (leftPos < 0) {
-        parent.classList.remove("wrapperAdjust");
-        elem.className += " shifted";
-        elem.style.top = "";
-        //@ts-ignore
-        elem.previousElementSibling.style.top = "";
-        //@ts-ignore
-        elem.previousElementSibling.style.left = "";
-      } else if (rightPos > window.innerWidth) {
-        parent.classList.remove("wrapperAdjust");
-        elem.classList.remove("bubbleAdjust", "shifted");
-        elem.style.top = "";
-        //@ts-ignore
-        elem.previousElementSibling.classList.remove("btnAdjust");
-        //@ts-ignore
-        elem.previousElementSibling.style.top = "";
-        //@ts-ignore
-        elem.previousElementSibling.style.left = "";
-      } else if (isDesktop) {
-        parent.classList.remove("wrapperAdjust");
-        elem.classList.remove("bubbleAdjust", "shifted");
-        elem.style.top = "";
-        //@ts-ignore
-        elem.previousElementSibling.classList.remove("btnAdjust");
-        //@ts-ignore
-        elem.previousElementSibling.style.top = "";
-        //@ts-ignore
-        elem.previousElementSibling.style.left = "";
+      const parentRect = parent.getBoundingClientRect();
+
+      const ul = this.shadow.host.parentElement
+        ?.parentElement as HTMLUListElement;
+      const isVisible =
+        elemRect.top >= 0 &&
+        elemRect.left >= 0 &&
+        elemRect.bottom - ul.scrollHeight <= window.innerHeight &&
+        elemRect.right <= window.innerWidth;
+
+      let left = parentRect.left;
+      let top = parentRect.top;
+      if (isDesktop && isVisible) {
+        left += parentRect.width + 10;
+      } else {
+        top -= elemRect.height + parentRect.height;
       }
+
+      elem.style.left = left + "px";
+      elem.style.top = top + "px";
     }
 
-    private createTooltip(content: string) {
+    private createTooltip(content: string, slot: string, time: string) {
       const uuid = crypto.randomUUID();
 
-      this.wrapper.dataset.tooltipWrapper = "";
-      this.wrapper.classList.add("wrapper");
+      this.tooltip.dataset.tooltipWrapper = "";
+      this.tooltip.classList.add("tooltip-wrapper");
 
       this.questionMark.textContent = "?";
       this.questionMark.type = "button";
@@ -421,79 +444,71 @@ import Layout from "../components/Layout.astro";
       bubble.classList.add("bubble");
       bubble.innerHTML = `<pre>${JSON.stringify(JSON.parse(JSON.parse(content)), null, 2)}</pre>`;
 
-      this.wrapper.append(this.questionMark);
-      this.wrapper.append(bubble);
+      const textSlot = document.createElement("span");
+      textSlot.textContent = slot;
+      textSlot.classList.add("slot");
+
+      this.tooltip.append(textSlot);
+      this.tooltip.append(this.questionMark);
+      this.tooltip.append(bubble);
+      this.tooltip.prepend(`[${time}] `);
     }
 
     private createStylesheet() {
       const stylesheet = new CSSStyleSheet();
       stylesheet.replaceSync(`
-  .wrapper {
-    position: relative;
-    display: inline-block;
-    margin-right: 8px;
-  }
+        .tooltip-wrapper {
+          position: relative;
+          display: inline-block;
+          margin-right: 8px;
+        }
 
-  button {
-    background-color: transparent;
-    border: 0;
-    padding: 0 var(--space-3xs);
-    font-size: 12px;
-    font-weight: bold;
-    text-decoration: underline dotted;
-    position: absolute;
-    bottom: 10px;
-    right: -12px;
-    cursor: pointer;
-    user-select: none;
-    text-decoration: underline dotted;
-    text-underline-offset: 2px;
-  }
+        .tooltip-wrapper button {
+          background-color: transparent;
+          border: 0;
+          color: var(--dark-green);
+          padding: 0 var(--space-3xs);
+          font-size: 12px;
+          font-weight: bold;
+          position: absolute;
+          bottom: 10px;
+          right: -12px;
+          cursor: pointer;
+          user-select: none;
+        }
 
-  .bubble {
-    position: absolute;
-    left: 50%;
-    bottom: 100%;
-    background-color: var(--light-green);
-    border: 1px solid var(--black);
-    padding: var(--space-2xs);
-    border-radius: 6px;
-    line-height: 1.25;
-    width: 18em;
-  }
+        .tooltip-wrapper .bubble {
+          position: fixed;
+          background-color: var(--light-green);
+          border: 1px solid var(--black);
+          padding: var(--space-2xs);
+          border-radius: 6px;
+          line-height: 1.25;
+          width: 18em;
+          z-index: 9999;
+        }
 
-  .bubble pre {
-    overflow-x: scroll;
-  }
+        .tooltip-wrapper .slot {
+          text-decoration: underline dotted;
+          text-underline-offset: 2px;
+          cursor: pointer;
+        }
 
-  button[aria-expanded="false"] + .bubble {
-    visibility: hidden;
-  }
+        .tooltip-wrapper .bubble pre {
+          overflow-x: scroll;
+        }
 
-  button[aria-expanded="true"] + .bubble {
-    visibility: visible;
-  }
+        .tooltip-wrapper button[aria-expanded="false"] + .bubble {
+          visibility: hidden;
+        }
 
-  .shifted {
-    left: 0;
-  }
-
-  .wrapperAdjust {
-    position: initial;
-  }
-
-  .bubbleAdjust {
-    left: 0;
-    bottom: initial;
-  }
-
-  .btnAdjust {
-    right: initial;
-    bottom: initial;
-  }`);
-
+        .tooltip-wrapper button[aria-expanded="true"] + .bubble {
+          visibility: visible;
+        }
+      `);
       return stylesheet;
     }
   }
+
   customElements.define("wm-tooltip", Tooltip);
 </script>
