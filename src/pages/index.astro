@@ -3,7 +3,10 @@ import Layout from "../components/Layout.astro";
 ---
 
 <Layout>
-  <h1>Web Monetization<br />Playground</h1>
+  <div class="header">
+    <img src="/img/wm-logo--animated.svg" />
+    <h1>Web Monetization Playground</h1>
+  </div>
   <div class="form-wrapper">
     <form id="walletAddressForm">
       <div class="form-field">
@@ -19,448 +22,482 @@ import Layout from "../components/Layout.astro";
     </form>
   </div>
   <div id="link-events"></div>
-</Layout>
 
-<style>
-  .form-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-block-start: 2rem;
-    margin-inline: auto;
-    max-width: 756px;
+  <style>
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: center;
 
-    form {
-      min-width: 378px;
-    }
-  }
-
-  .form-field {
-    display: flex;
-    flex-direction: column;
-    margin-block-end: 1rem;
-
-    label {
-      white-space: nowrap;
-      margin-block-end: 0.25rem;
-    }
-
-    .form-field-error {
-      margin-block-start: 0.5rem;
-      color: red;
-    }
-  }
-
-  #link-events {
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(50ch, 1fr));
-    margin-block-start: 2rem;
-
-    div[data-wallet-address] {
-      border-radius: 0.5rem;
-      border: 2px solid var(--black);
-      padding: 0.5rem;
-
-      & .log-header {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        justify-content: space-between;
-        flex-direction: row;
-        color: var(--dark-green);
-
-        & h4 {
-          overflow-x: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-      }
-
-      & .actions {
-        display: flex;
-        gap: 1rem;
-      }
-
-      & .amount {
-        margin-block-end: 0.5rem;
-      }
-
-      & ul.events {
-        height: 16rem;
-        margin-block: 0.5rem;
-        padding-block-start: 0.5rem;
-        padding-inline-start: 0.5rem;
-        list-style: none;
-        overflow-y: auto;
+      img {
+        max-width: 100px;
       }
     }
-  }
 
-  @media screen and (min-width: 768px) {
-    main {
-      padding: 2rem;
-    }
-
-    #link-events {
-      padding-inline: 2rem;
-    }
-  }
-
-  @media screen and (max-width: 768px) {
-    #link-events {
+    .form-wrapper {
       display: flex;
       flex-direction: column;
+      align-items: center;
+      margin-block-start: 2rem;
+      margin-inline: auto;
+      max-width: 756px;
+
+      form {
+        min-width: 378px;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      margin-block-end: 1rem;
+
+      label {
+        white-space: nowrap;
+        margin-block-end: 0.25rem;
+      }
+
+      .form-field-error {
+        margin-block-start: 0.5rem;
+        color: red;
+      }
+    }
+
+    #link-events {
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(50ch, 1fr));
+      margin-block-start: 2rem;
 
       div[data-wallet-address] {
+        border-radius: 0.5rem;
+        border: 2px solid var(--black);
+        padding: 0.5rem;
+
         & .log-header {
-          align-items: flex-start;
-          flex-direction: column;
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          justify-content: space-between;
+          flex-direction: row;
+          color: var(--dark-green);
 
           & h4 {
-            margin-inline: auto;
+            overflow-x: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+
+        & .actions {
+          display: flex;
+          gap: 1rem;
+        }
+
+        & .amount {
+          margin-block-end: 0.5rem;
+        }
+
+        & ul.events {
+          height: 16rem;
+          margin-block: 0.5rem;
+          padding-block-start: 0.5rem;
+          padding-inline-start: 0.5rem;
+          list-style: none;
+          overflow-y: auto;
+        }
+      }
+    }
+
+    @media screen and (min-width: 768px) {
+      main {
+        padding: 2rem;
+      }
+
+      #link-events {
+        padding-inline: 2rem;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      #link-events {
+        display: flex;
+        flex-direction: column;
+
+        div[data-wallet-address] {
+          & .log-header {
+            align-items: flex-start;
+            flex-direction: column;
+
+            & h4 {
+              margin-inline: auto;
+            }
+
+            & .actions {
+              width: 100%;
+              padding-inline: 5rem;
+
+              & button:last-of-type {
+                display: block;
+                margin-inline-start: auto;
+              }
+            }
           }
 
-          & .actions {
-            width: 100%;
-            padding-inline: 5rem;
-
-            & button:last-of-type {
-              display: block;
-              margin-inline-start: auto;
-            }
+          & ul.events {
+            font-size: 14px;
+            letter-spacing: -1px;
           }
         }
       }
     }
-  }
-</style>
+  </style>
 
-<script>
-  interface WalletAddress {
-    id: string;
-    assetScale: number;
-    assetCode: string;
-    authServer: string;
-    resourceServer: string;
-  }
+  <script>
+    interface WalletAddress {
+      id: string;
+      assetScale: number;
+      assetCode: string;
+      authServer: string;
+      resourceServer: string;
+    }
 
-  const form = document.querySelector("#walletAddressForm") as HTMLFormElement;
-  const input = form.querySelector("input") as HTMLInputElement;
-  const linkEvents = document.querySelector("#link-events") as HTMLDivElement;
+    const form = document.querySelector(
+      "#walletAddressForm"
+    ) as HTMLFormElement;
+    const input = form.querySelector("input") as HTMLInputElement;
+    const submitButton = form.querySelector("button") as HTMLButtonElement;
+    const linkEvents = document.querySelector("#link-events") as HTMLDivElement;
 
-  async function createLinkTag(href: string) {
-    const link = document.createElement("link");
+    const SUBMIT_BUTTON_TEXT = {
+      default: "Add monetization link",
+      processing: "Processing...",
+    };
 
-    link.rel = "monetization";
-    link.href = href;
-    link.addEventListener("monetization", onMonetizationListener);
-    link.addEventListener("load", onLoadListener);
-    link.addEventListener("error", onErrorListener);
-    link.dataset.walletAddress = href;
+    async function createLinkTag(href: string) {
+      const link = document.createElement("link");
 
-    document.head.append(link);
-  }
+      link.rel = "monetization";
+      link.href = href;
+      link.addEventListener("monetization", onMonetizationListener);
+      link.addEventListener("load", onLoadListener);
+      link.addEventListener("error", onErrorListener);
+      link.dataset.walletAddress = href;
 
-  async function createLinkEventLog(href: string) {
-    const header = document.createElement("div");
-    header.classList.add("log-header");
+      document.head.append(link);
+    }
 
-    const title = document.createElement("h4");
-    title.textContent = href;
+    async function createLinkEventLog(href: string) {
+      const header = document.createElement("div");
+      header.classList.add("log-header");
 
-    const actions = document.createElement("div");
-    actions.classList.add("actions");
+      const title = document.createElement("h4");
+      title.textContent = href;
 
-    const disableButton = document.createElement("button");
-    disableButton.textContent = "Disable";
-    disableButton.classList.add("outline");
-    disableButton.addEventListener("click", () => {
-      const link = document.querySelector(
-        `link[rel='monetization'][href='${href}']`
-      ) as HTMLLinkElement;
-      link.disabled = !link.disabled;
-      disableButton.textContent = link.disabled ? "Enable" : "Disable";
-    });
+      const actions = document.createElement("div");
+      actions.classList.add("actions");
 
-    const removeButton = document.createElement("button");
-    removeButton.textContent = "Remove";
-    removeButton.classList.add("outline");
-    removeButton.addEventListener("click", () => {
-      const link = document.querySelector(
-        `link[rel='monetization'][href='${href}']`
-      ) as HTMLLinkElement;
-      link.remove();
-      const eventLog = document.querySelector(
-        `#link-events div[data-wallet-address='${href}']`
+      const disableButton = document.createElement("button");
+      disableButton.textContent = "Disable";
+      disableButton.classList.add("outline");
+      disableButton.addEventListener("click", () => {
+        const link = document.querySelector(
+          `link[rel='monetization'][href='${href}']`
+        ) as HTMLLinkElement;
+        link.disabled = !link.disabled;
+        disableButton.textContent = link.disabled ? "Enable" : "Disable";
+      });
+
+      const removeButton = document.createElement("button");
+      removeButton.textContent = "Remove";
+      removeButton.classList.add("outline");
+      removeButton.addEventListener("click", () => {
+        const link = document.querySelector(
+          `link[rel='monetization'][href='${href}']`
+        ) as HTMLLinkElement;
+        link.remove();
+        const eventLog = document.querySelector(
+          `#link-events div[data-wallet-address='${href}']`
+        ) as HTMLDivElement;
+        eventLog.remove();
+      });
+
+      actions.append(disableButton);
+      actions.append(removeButton);
+
+      header.append(title);
+      header.append(actions);
+
+      const eventLog = document.createElement("div");
+      eventLog.dataset.walletAddress = href;
+
+      const events = document.createElement("ul");
+      events.classList.add("events");
+
+      eventLog.append(header);
+      eventLog.append(events);
+
+      linkEvents.append(eventLog);
+    }
+
+    function getLinkEventLog(event: Event): HTMLDivElement | null {
+      if (!(event.target instanceof HTMLLinkElement)) return null;
+      if (!event.target.isConnected) return null;
+
+      return document.querySelector(
+        `#link-events div[data-wallet-address='${event.target.dataset.walletAddress}'] ul.events`
       ) as HTMLDivElement;
-      eventLog.remove();
-    });
-
-    actions.append(disableButton);
-    actions.append(removeButton);
-
-    header.append(title);
-    header.append(actions);
-
-    const eventLog = document.createElement("div");
-    eventLog.dataset.walletAddress = href;
-
-    const events = document.createElement("ul");
-    events.classList.add("events");
-
-    eventLog.append(header);
-    eventLog.append(events);
-
-    linkEvents.append(eventLog);
-  }
-
-  function getLinkEventLog(event: Event): HTMLDivElement | null {
-    if (!(event.target instanceof HTMLLinkElement)) return null;
-    if (!event.target.isConnected) return null;
-
-    return document.querySelector(
-      `#link-events div[data-wallet-address='${event.target.dataset.walletAddress}'] ul.events`
-    ) as HTMLDivElement;
-  }
-
-  function capitalize(str: string) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
-  function createLog(
-    div: HTMLDivElement,
-    type: string,
-    event?: MonetizationEvent
-  ) {
-    const log = document.createElement("li");
-    const time = new Date().toLocaleTimeString();
-    let slot = `${capitalize(type)} Event`;
-
-    if (event) {
-      slot += ` - ${event.amountSent.value} ${event.amountSent.currency}`;
-      log.innerHTML = `<wm-tooltip time="${time}" slot="${slot}" content='${JSON.stringify(JSON.stringify(event))}'></wm-tooltip>`;
-    } else {
-      log.textContent = `[${time}] ${slot}`;
     }
 
-    div.prepend(log);
-  }
-
-  function onMonetizationListener(event: MonetizationEvent) {
-    const linkEventLog = getLinkEventLog(event);
-    if (!linkEventLog) return;
-
-    if (linkEventLog.dataset.incomingPayment !== event.incomingPayment) {
-      linkEventLog.dataset.incomingPayment = event.incomingPayment;
+    function capitalize(str: string) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    createLog(linkEventLog, event.type, event);
-    createLog(linkEventLog, event.type, event);
-    createLog(linkEventLog, event.type, event);
-    createLog(linkEventLog, event.type, event);
-    createLog(linkEventLog, event.type, event);
-  }
+    function createLog(
+      div: HTMLDivElement,
+      type: string,
+      event?: MonetizationEvent
+    ) {
+      const log = document.createElement("li");
+      const time = new Date().toLocaleTimeString();
+      let slot = `${capitalize(type)} Event`;
 
-  function onLoadListener(event: Event) {
-    const linkEventLog = getLinkEventLog(event);
-    if (!linkEventLog) return;
-
-    createLog(linkEventLog, event.type);
-  }
-
-  function onErrorListener(event: Event) {
-    const linkEventLog = getLinkEventLog(event);
-    if (!linkEventLog) return;
-
-    createLog(linkEventLog, event.type);
-  }
-
-  input.addEventListener("input", function (e) {
-    this.setCustomValidity("");
-  });
-
-  function toWalletAddressUrl(s: string): string {
-    return s.startsWith("$") ? s.replace("$", "https://") : s;
-  }
-
-  async function validateWalletAddressUrl(url: string): Promise<void> {
-    const walletAddressUrl = new URL(toWalletAddressUrl(url)).href;
-    const response = await fetch(walletAddressUrl, {
-      method: "GET",
-      credentials: "omit",
-      headers: {
-        Accept: "application/json",
-      },
-    });
-    const walletAddress = await response.json();
-    const isValid = isWalletAddress(walletAddress);
-
-    if (!isValid) {
-      input.setCustomValidity(
-        `${walletAddressUrl} is not a valid wallet address.`
-      );
-      input.reportValidity();
-      throw new Error("Invalid wallet address.");
-    }
-  }
-
-  function isWalletAddress(o: any): o is WalletAddress {
-    return (
-      o.id &&
-      typeof o.id === "string" &&
-      o.assetScale &&
-      typeof o.assetScale === "number" &&
-      o.assetCode &&
-      typeof o.assetCode === "string" &&
-      o.authServer &&
-      typeof o.authServer === "string" &&
-      o.resourceServer &&
-      typeof o.resourceServer === "string"
-    );
-  }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(form);
-    const walletAddress = formData.get("walletAddressUrl")?.valueOf();
-
-    if (!walletAddress || typeof walletAddress !== "string") {
-      input.setCustomValidity("Please fill the wallet address URL field.");
-      return false;
-    }
-
-    const walletAddressUrl = toWalletAddressUrl(walletAddress);
-
-    const walletAddressElement = document.querySelector(
-      `[data-wallet-address='${walletAddress}']`
-    );
-    if (walletAddressElement) {
-      input.setCustomValidity(`${walletAddress} already exists in the page.`);
-      input.reportValidity();
-      return false;
-    }
-
-    await validateWalletAddressUrl(walletAddressUrl);
-    await createLinkEventLog(walletAddressUrl);
-    await createLinkTag(walletAddressUrl);
-
-    form.reset();
-  });
-
-  class Tooltip extends HTMLElement {
-    private tooltip: HTMLSpanElement = document.createElement("span");
-    private questionMark: HTMLButtonElement = document.createElement("button");
-    private shadow = this.attachShadow({ mode: "open" });
-    constructor() {
-      super();
-    }
-
-    connectedCallback() {
-      const stylesheet = this.createStylesheet();
-
-      const content = this.getAttribute("content");
-      const slot = this.getAttribute("slot");
-      const time = this.getAttribute("time");
-
-      if (!content || !slot || !time) {
-        throw new Error(
-          "Make sure `content` and `slot` attributes are passed to the component."
-        );
-      }
-
-      this.createTooltip(content, slot, time);
-
-      this.shadow.append(this.tooltip);
-      this.shadow.adoptedStyleSheets = [stylesheet];
-      this.registerEventListeners();
-    }
-
-    private registerEventListeners() {
-      this.tooltip.addEventListener("mouseenter", () => {
-        const button = this.tooltip.querySelector(
-          "button"
-        ) as HTMLButtonElement;
-        button.setAttribute("aria-expanded", "true");
-        const bubble = this.tooltip.querySelector(".bubble") as HTMLSpanElement;
-        this.positionTooltip(bubble);
-      });
-
-      this.tooltip.addEventListener("mouseleave", () => {
-        const button = this.tooltip.querySelector(
-          "button"
-        ) as HTMLButtonElement;
-        button.setAttribute("aria-expanded", "false");
-        const bubble = this.tooltip.querySelector(".bubble") as HTMLSpanElement;
-        bubble.style.left = "initial";
-        bubble.style.top = "initial";
-      });
-    }
-
-    private positionTooltip(elem: HTMLSpanElement) {
-      const isDesktop = window.innerWidth > 768;
-      const elemRect = elem.getBoundingClientRect();
-      const parent = elem.parentElement as HTMLElement;
-      const parentRect = parent.getBoundingClientRect();
-
-      const ul = this.shadow.host.parentElement
-        ?.parentElement as HTMLUListElement;
-      const isVisible =
-        elemRect.top >= 0 &&
-        elemRect.left >= 0 &&
-        elemRect.bottom - ul.scrollHeight <= window.innerHeight &&
-        elemRect.right <= window.innerWidth;
-
-      let left = parentRect.left;
-      let top = parentRect.top;
-      if (isDesktop && isVisible) {
-        left += parentRect.width + 10;
+      if (event) {
+        slot += ` - ${event.amountSent.value} ${event.amountSent.currency}`;
+        log.innerHTML = `<wm-tooltip time="${time}" slot="${slot}" content='${JSON.stringify(JSON.stringify(event))}'></wm-tooltip>`;
       } else {
-        top -= elemRect.height + parentRect.height;
+        log.textContent = `[${time}] ${slot}`;
       }
 
-      elem.style.left = left + "px";
-      elem.style.top = top + "px";
+      div.prepend(log);
     }
 
-    private createTooltip(content: string, slot: string, time: string) {
-      const uuid = crypto.randomUUID();
+    function onMonetizationListener(event: MonetizationEvent) {
+      const linkEventLog = getLinkEventLog(event);
+      if (!linkEventLog) return;
 
-      this.tooltip.dataset.tooltipWrapper = "";
-      this.tooltip.classList.add("tooltip-wrapper");
+      if (linkEventLog.dataset.incomingPayment !== event.incomingPayment) {
+        linkEventLog.dataset.incomingPayment = event.incomingPayment;
+      }
 
-      this.questionMark.textContent = "?";
-      this.questionMark.type = "button";
-      this.questionMark.ariaExpanded = "false";
-      this.questionMark.ariaLabel = "Definition";
-      this.questionMark.dataset.tooltipButton = "";
-      this.questionMark.setAttribute("aria-labelledby", uuid);
-
-      const bubble = document.createElement("span");
-      bubble.id = uuid;
-      bubble.role = "tooltip";
-      bubble.dataset.tooltipBubble = "";
-      bubble.classList.add("bubble");
-      bubble.innerHTML = `<pre>${JSON.stringify(JSON.parse(JSON.parse(content)), null, 2)}</pre>`;
-
-      const textSlot = document.createElement("span");
-      textSlot.textContent = slot;
-      textSlot.classList.add("slot");
-
-      this.tooltip.append(textSlot);
-      this.tooltip.append(this.questionMark);
-      this.tooltip.append(bubble);
-      this.tooltip.prepend(`[${time}] `);
+      createLog(linkEventLog, event.type, event);
     }
 
-    private createStylesheet() {
-      const stylesheet = new CSSStyleSheet();
-      stylesheet.replaceSync(`
+    function onLoadListener(event: Event) {
+      const linkEventLog = getLinkEventLog(event);
+      if (!linkEventLog) return;
+
+      createLog(linkEventLog, event.type);
+    }
+
+    function onErrorListener(event: Event) {
+      const linkEventLog = getLinkEventLog(event);
+      if (!linkEventLog) return;
+
+      createLog(linkEventLog, event.type);
+    }
+
+    input.addEventListener("input", function () {
+      this.setCustomValidity("");
+    });
+
+    function toWalletAddressUrl(s: string): string {
+      return s.startsWith("$") ? s.replace("$", "https://") : s;
+    }
+
+    async function validateWalletAddressUrl(url: string): Promise<void> {
+      const walletAddressUrl = new URL(toWalletAddressUrl(url)).href;
+      const response = await fetch(walletAddressUrl, {
+        method: "GET",
+        credentials: "omit",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      const walletAddress = await response.json();
+      const isValid = isWalletAddress(walletAddress);
+
+      if (!isValid) {
+        input.setCustomValidity(
+          `${walletAddressUrl} is not a valid wallet address.`
+        );
+        input.reportValidity();
+        throw new Error("Invalid wallet address.");
+      }
+    }
+
+    function isWalletAddress(o: any): o is WalletAddress {
+      return (
+        o.id &&
+        typeof o.id === "string" &&
+        o.assetScale &&
+        typeof o.assetScale === "number" &&
+        o.assetCode &&
+        typeof o.assetCode === "string" &&
+        o.authServer &&
+        typeof o.authServer === "string" &&
+        o.resourceServer &&
+        typeof o.resourceServer === "string"
+      );
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      submitButton.disabled = true;
+      submitButton.textContent = SUBMIT_BUTTON_TEXT.processing;
+
+      const formData = new FormData(form);
+      const walletAddress = formData.get("walletAddressUrl")?.valueOf();
+
+      if (!walletAddress || typeof walletAddress !== "string") {
+        submitButton.disabled = false;
+        submitButton.textContent = SUBMIT_BUTTON_TEXT.default;
+        input.setCustomValidity("Please fill the wallet address URL field.");
+        return false;
+      }
+
+      const walletAddressUrl = toWalletAddressUrl(walletAddress);
+
+      const walletAddressElement = document.querySelector(
+        `[data-wallet-address='${walletAddress}']`
+      );
+      if (walletAddressElement) {
+        submitButton.disabled = false;
+        submitButton.textContent = SUBMIT_BUTTON_TEXT.default;
+        input.setCustomValidity(`${walletAddress} already exists in the page.`);
+        input.reportValidity();
+        return false;
+      }
+
+      await validateWalletAddressUrl(walletAddressUrl);
+      await createLinkEventLog(walletAddressUrl);
+      await createLinkTag(walletAddressUrl);
+
+      form.reset();
+      submitButton.disabled = false;
+      submitButton.textContent = SUBMIT_BUTTON_TEXT.default;
+    });
+
+    class Tooltip extends HTMLElement {
+      private tooltip: HTMLSpanElement = document.createElement("span");
+      private questionMark: HTMLButtonElement =
+        document.createElement("button");
+      private shadow = this.attachShadow({ mode: "open" });
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        const stylesheet = this.createStylesheet();
+
+        const content = this.getAttribute("content");
+        const slot = this.getAttribute("slot");
+        const time = this.getAttribute("time");
+
+        if (!content || !slot || !time) {
+          throw new Error(
+            "Make sure `content` and `slot` attributes are passed to the component."
+          );
+        }
+
+        this.createTooltip(content, slot, time);
+
+        this.shadow.append(this.tooltip);
+        this.shadow.adoptedStyleSheets = [stylesheet];
+        this.registerEventListeners();
+      }
+
+      private registerEventListeners() {
+        this.tooltip.addEventListener("mouseenter", () => {
+          const button = this.tooltip.querySelector(
+            "button"
+          ) as HTMLButtonElement;
+          button.setAttribute("aria-expanded", "true");
+          const bubble = this.tooltip.querySelector(
+            ".bubble"
+          ) as HTMLSpanElement;
+          this.positionTooltip(bubble);
+        });
+
+        this.tooltip.addEventListener("mouseleave", () => {
+          const button = this.tooltip.querySelector(
+            "button"
+          ) as HTMLButtonElement;
+          button.setAttribute("aria-expanded", "false");
+          const bubble = this.tooltip.querySelector(
+            ".bubble"
+          ) as HTMLSpanElement;
+          bubble.style.left = "initial";
+          bubble.style.top = "initial";
+        });
+      }
+
+      private positionTooltip(elem: HTMLSpanElement) {
+        const isDesktop = window.innerWidth > 768;
+        const elemRect = elem.getBoundingClientRect();
+        const parent = elem.parentElement as HTMLElement;
+        const parentRect = parent.getBoundingClientRect();
+
+        const ul = this.shadow.host.parentElement
+          ?.parentElement as HTMLUListElement;
+        const isVisible =
+          elemRect.top >= 0 &&
+          elemRect.left >= 0 &&
+          elemRect.bottom - ul.scrollHeight <= window.innerHeight &&
+          elemRect.right <= window.innerWidth;
+
+        let left = parentRect.left;
+        let top = parentRect.top;
+        if (isDesktop && isVisible) {
+          left += parentRect.width + 10;
+        } else {
+          top -= elemRect.height + parentRect.height;
+        }
+
+        elem.style.left = left + "px";
+        elem.style.top = top + "px";
+      }
+
+      private createTooltip(content: string, slot: string, time: string) {
+        const uuid = crypto.randomUUID();
+
+        this.tooltip.dataset.tooltipWrapper = "";
+        this.tooltip.classList.add("tooltip-wrapper");
+
+        this.questionMark.textContent = "?";
+        this.questionMark.type = "button";
+        this.questionMark.ariaExpanded = "false";
+        this.questionMark.ariaLabel = "Definition";
+        this.questionMark.dataset.tooltipButton = "";
+        this.questionMark.setAttribute("aria-labelledby", uuid);
+
+        const bubble = document.createElement("span");
+        bubble.id = uuid;
+        bubble.role = "tooltip";
+        bubble.dataset.tooltipBubble = "";
+        bubble.classList.add("bubble");
+        bubble.innerHTML = `<pre>${JSON.stringify(JSON.parse(JSON.parse(content)), null, 2)}</pre>`;
+
+        const textSlot = document.createElement("span");
+        textSlot.textContent = slot;
+        textSlot.classList.add("slot");
+
+        this.tooltip.append(textSlot);
+        this.tooltip.append(this.questionMark);
+        this.tooltip.append(bubble);
+        this.tooltip.prepend(`[${time}] `);
+      }
+
+      private createStylesheet() {
+        const stylesheet = new CSSStyleSheet();
+        stylesheet.replaceSync(`
         .tooltip-wrapper {
           position: relative;
           display: inline-block;
           margin-right: 8px;
+        //   letter-spacing: initial;
+        //   font-size: initial;
         }
 
         .tooltip-wrapper button {
@@ -505,10 +542,18 @@ import Layout from "../components/Layout.astro";
         .tooltip-wrapper button[aria-expanded="true"] + .bubble {
           visibility: visible;
         }
-      `);
-      return stylesheet;
-    }
-  }
 
-  customElements.define("wm-tooltip", Tooltip);
-</script>
+        //  @media screen and (max-width: 768px) {
+        //    .tooltip-wrapper {
+        //      font-size: 14px;
+        //      letter-spacing: -1px;
+        //    }
+        //  }
+      `);
+        return stylesheet;
+      }
+    }
+
+    customElements.define("wm-tooltip", Tooltip);
+  </script>
+</Layout>
