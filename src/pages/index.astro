@@ -10,7 +10,7 @@ import Layout from "../components/Layout.astro";
   <div class="form-wrapper">
     <form id="walletAddressForm">
       <div class="form-field">
-        <label for="walletAddressUrl">Wallet address URL</label>
+        <label for="walletAddressUrl">Wallet address/Payment pointer</label>
         <input
           type="text"
           id="walletAddressUrl"
@@ -106,6 +106,7 @@ import Layout from "../components/Layout.astro";
           padding-inline-start: 0.5rem;
           list-style: none;
           overflow-y: auto;
+          white-space: nowrap;
         }
       }
     }
@@ -132,22 +133,56 @@ import Layout from "../components/Layout.astro";
 
             & h4 {
               margin-inline: auto;
+              font-size: smaller;
+              width: 100%;
             }
 
             & .actions {
               width: 100%;
-              padding-inline: 5rem;
-
-              & button:last-of-type {
-                display: block;
-                margin-inline-start: auto;
-              }
+              justify-content: center;
+              gap: 4rem;
             }
           }
 
           & ul.events {
             font-size: 14px;
             letter-spacing: -1px;
+          }
+        }
+      }
+    }
+
+    @media screen and (max-width: 425px) {
+      .header {
+        img {
+          max-width: 50px;
+        }
+
+        & h1 {
+          font-size: smaller;
+        }
+      }
+
+      form {
+        min-width: 100% !important;
+      }
+
+      #link-events {
+        & div[data-wallet-address] {
+          & .log-header {
+            & h4 {
+              font-size: 12px;
+            }
+
+            & .actions {
+              & button {
+                font-size: smaller;
+              }
+            }
+          }
+
+          & ul.events {
+            font-size: smaller;
           }
         }
       }
