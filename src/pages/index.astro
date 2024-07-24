@@ -132,7 +132,7 @@ import Layout from "../components/Layout.astro";
             flex-direction: column;
 
             & h4 {
-              margin-inline: auto;
+              text-align: center;
               font-size: smaller;
               width: 100%;
             }
@@ -140,7 +140,11 @@ import Layout from "../components/Layout.astro";
             & .actions {
               width: 100%;
               justify-content: center;
-              gap: 4rem;
+              gap: 1rem;
+
+              & button {
+                font-size: smaller;
+              }
             }
           }
 
@@ -258,7 +262,18 @@ import Layout from "../components/Layout.astro";
         eventLog.remove();
       });
 
+      const clearButton = document.createElement("button");
+      clearButton.textContent = "Clear events";
+      clearButton.classList.add("outline");
+      clearButton.addEventListener("click", () => {
+        const ul = document.querySelector(
+          `#link-events div[data-wallet-address='${href}'] ul.events`
+        ) as HTMLDivElement;
+        ul.innerHTML = "";
+      });
+
       actions.append(disableButton);
+      actions.append(clearButton);
       actions.append(removeButton);
 
       header.append(title);
