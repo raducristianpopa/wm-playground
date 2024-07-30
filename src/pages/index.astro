@@ -420,7 +420,18 @@ import Layout from "../components/Layout.astro";
         return false;
       }
 
-      await validateWalletAddressUrl(walletAddressUrl);
+      try {
+        await validateWalletAddressUrl(walletAddressUrl);
+      } catch (e) {
+        input.setCustomValidity(
+          `${walletAddress} is not a valid wallet address/payment pointer.`
+        );
+        input.reportValidity();
+        submitButton.disabled = false;
+        submitButton.textContent = SUBMIT_BUTTON_TEXT.default;
+        return;
+      }
+
       await createLinkEventLog(walletAddressUrl);
       await createLinkTag(walletAddressUrl);
 
@@ -546,8 +557,6 @@ import Layout from "../components/Layout.astro";
           position: relative;
           display: inline-block;
           margin-right: 8px;
-        //   letter-spacing: initial;
-        //   font-size: initial;
         }
 
         .tooltip-wrapper button {
@@ -592,13 +601,6 @@ import Layout from "../components/Layout.astro";
         .tooltip-wrapper button[aria-expanded="true"] + .bubble {
           visibility: visible;
         }
-
-        //  @media screen and (max-width: 768px) {
-        //    .tooltip-wrapper {
-        //      font-size: 14px;
-        //      letter-spacing: -1px;
-        //    }
-        //  }
       `);
         return stylesheet;
       }
